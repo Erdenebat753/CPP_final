@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/qt/qml/finalproject">
+        <file>main.qml</file>
+        <file>qml/components/HeroBanner.qml</file>
+        <file>qml/components/MediaCard.qml</file>
+        <file>qml/components/NavigationBar.qml</file>
+        <file>qml/pages/HomePage.qml</file>
+        <file>qml/pages/LoginPage.qml</file>
+        <file>qml/utils/Formatting.js</file>
+    </qresource>
+</RCC>
