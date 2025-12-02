@@ -23,6 +23,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <OutDir>$(ProjectDir)x64\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -30,6 +31,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <OutDir>$(ProjectDir)x64\$(Configuration)\</OutDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
@@ -93,15 +95,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="shared\DatabaseUtils.h" />
-    <ClInclude Include="models\MediaModels.h" />
-    <ClInclude Include="models\StreamingDataModel.h" />
+    <ClInclude Include="core\AuthService.h" />
+    <ClInclude Include="core\AuthRepository.h" />
+    <ClInclude Include="core\DataProvider.h" />
+    <ClInclude Include="core\MediaModels.h" />
+    <ClInclude Include="core\StreamingService.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="shared\DatabaseUtils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="shared\DatabaseUtils.cpp" />
+    <QtMoc Include="backend\Backend.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="backend\Backend.cpp" />
+    <ClCompile Include="core\AuthService.cpp" />
+    <ClCompile Include="core\StreamingService.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="models\StreamingDataModel.cpp" />
+    <ClCompile Include="shared\DatabaseUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="qml.qrc" />
@@ -109,8 +119,10 @@
     <None Include="qml\components\HeroBanner.qml" />
     <None Include="qml\components\MediaCard.qml" />
     <None Include="qml\components\NavigationBar.qml" />
+    <None Include="qml\pages\AdminPage.qml" />
     <None Include="qml\pages\HomePage.qml" />
     <None Include="qml\pages\LoginPage.qml" />
+    <None Include="qml\pages\ProfilePage.qml" />
     <None Include="qml\utils\Formatting.js" />
   </ItemGroup>
   <ItemGroup>

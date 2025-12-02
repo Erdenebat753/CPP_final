@@ -4,15 +4,29 @@ import QtQuick.Layouts 1.15
 import "../components"
 
 Item {
-    id: homePage
-    property var heroItem: ({})
+    id: moviesPage
     property var categoriesModel: []
+    property string userEmail: ""
     property var selectedItem: ({})
     property bool showDetails: false
-    readonly property bool isSeries: (selectedItem && selectedItem.type && selectedItem.type.toLowerCase && selectedItem.type.toLowerCase() === "series")
-    property string userEmail: ""
     property string actionStatus: ""
     property var playHandler: null
+
+    function filteredCategories() {
+        const result = []
+        const list = categoriesModel || []
+        for (let i = 0; i < list.length; i++) {
+            const cat = list[i] || {}
+            const items = (cat.items || []).filter(function(it) {
+                const t = (it.type || "").toLowerCase()
+                return t === "" || t === "movie"
+            })
+            if (items.length > 0) {
+                result.push({ name: cat.name, items: items })
+            }
+        }
+        return result
+    }
 
     Flickable {
         id: contentArea
@@ -26,17 +40,31 @@ Item {
         Column {
             id: contentColumn
             width: parent.width
-            spacing: 32
+            spacing: 24
             property int horizontalPadding: 32
+            anchors.top: parent.top
+            anchors.topMargin: 24
 
-            HeroBanner {
-                width: Math.max(0, contentColumn.width - contentColumn.horizontalPadding * 2)
-                anchors.horizontalCenter: parent.horizontalCenter
-                heroItem: homePage.heroItem
+            Rectangle {
+                width: parent.width
+                height: 60
+                color: "transparent"
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: contentColumn.horizontalPadding
+                    spacing: 12
+                    Text {
+                        text: qsTr("Movies")
+                        color: "white"
+                        font.pixelSize: 28
+                        font.bold: true
+                        Layout.fillWidth: true
+                    }
+                }
             }
 
             Repeater {
-                model: homePage.categoriesModel || []
+                model: filteredCategories()
                 delegate: Column {
                     width: contentColumn.width
                     spacing: 12
@@ -55,12 +83,6 @@ Item {
                             font.bold: true
                             anchors.left: parent.left
                         }
-
-                        Text {
-                            text: qsTr("See all")
-                            color: "#90CAF9"
-                            anchors.right: parent.right
-                        }
                     }
 
                     ListView {
@@ -75,18 +97,17 @@ Item {
                         delegate: MediaCard {
                             card: modelData || ({})
                             onClicked: {
-                        homePage.selectedItem = modelData || ({})
-                        homePage.actionStatus = ""
-                        homePage.showDetails = true
+                                selectedItem = modelData || ({})
+                                actionStatus = ""
+                                showDetails = true
+                            }
+                        }
                     }
                 }
             }
         }
     }
-        }
-    }
 
-    // Overlay centered modal
     Rectangle {
         anchors.fill: parent
         visible: showDetails
@@ -94,19 +115,18 @@ Item {
         z: 10
 
         MouseArea {
-            id: backdrop
+            id: moviesBackdrop
             anchors.fill: parent
-            hoverEnabled: false
             onClicked: {
-                const p = detailCard.mapFromItem(backdrop, mouse.x, mouse.y)
-                if (p.x < 0 || p.y < 0 || p.x > detailCard.width || p.y > detailCard.height) {
+                const p = detailCardMovies.mapFromItem(moviesBackdrop, mouse.x, mouse.y)
+                if (p.x < 0 || p.y < 0 || p.x > detailCardMovies.width || p.y > detailCardMovies.height) {
                     showDetails = false
                 }
             }
         }
 
         Rectangle {
-            id: detailCard
+            id: detailCardMovies
             width: Math.min(parent.width - 120, 900)
             height: Math.min(parent.height - 120, 620)
             radius: 16
@@ -156,54 +176,25 @@ Item {
 
                 Rectangle { Layout.fillWidth: true; height: 1; color: "#1E293B"; opacity: 0.7 }
 
+                Rectangle { Layout.fillWidth: true; height: 1; color: "#1E293B"; opacity: 0.7 }
+
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 8
 
                     Text {
-                        text: isSeries ? qsTr("Episodes") : qsTr("More info")
+                        text: qsTr("More info")
                         color: "white"
                         font.pixelSize: 18
                         font.bold: true
                     }
 
-                    ListView {
+                    Text {
+                        text: selectedItem.description || qsTr("No additional info.")
+                        color: "#9FB3C8"
+                        font.pixelSize: 13
+                        wrapMode: Text.WordWrap
                         Layout.fillWidth: true
-                        Layout.preferredHeight: isSeries ? 260 : 120
-                        clip: true
-                        model: isSeries ? 8 : 1
-                        delegate: Rectangle {
-                            width: parent ? parent.width : 0
-                            height: 48
-                            radius: 8
-                            color: index % 2 === 0 ? "#0B1220" : "#0E1525"
-                            border.color: "#1E293B"
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                spacing: 10
-                                Text {
-                                    text: isSeries ? qsTr("Episode %1").arg(index + 1) : (selectedItem.title || "")
-                                    color: "white"
-                                    font.pixelSize: 14
-                                    font.bold: true
-                                    Layout.fillWidth: true
-                                }
-                                Text {
-                                    text: isSeries ? qsTr("~45 min") : (selectedItem.duration || "")
-                                    color: "#9FB3C8"
-                                    font.pixelSize: 12
-                                }
-                            }
-                        }
-                        footer: Component {
-                            Text {
-                                text: isSeries ? "" : qsTr("No extra info")
-                                color: "#9FB3C8"
-                                horizontalAlignment: Text.AlignHCenter
-                                visible: !isSeries
-                            }
-                        }
                     }
                 }
 

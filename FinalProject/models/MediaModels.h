@@ -5,6 +5,7 @@
 
 struct MediaItem
 {
+    QString type;
     QString title;
     QString genre;
     QString duration;

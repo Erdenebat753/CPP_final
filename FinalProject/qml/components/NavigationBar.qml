@@ -4,6 +4,12 @@ import QtQuick.Layouts 1.15
 
 Rectangle {
     id: navigationBar
+    property string currentPage: ""
+    signal goHome()
+    signal openSeries()
+    signal openMovies()
+    signal openMyList()
+    signal openProfile()
     color: Qt.rgba(0, 0, 0, 0.85)
     height: 72
     implicitHeight: height
@@ -13,25 +19,56 @@ Rectangle {
     RowLayout {
         anchors.fill: parent
         anchors.margins: 32
-        spacing: 18
+        spacing: 28
 
         Label {
+            id: brandLabel
             text: qsTr("NEBULA")
             color: "white"
             font.pixelSize: 22
             font.bold: true
             font.letterSpacing: 6
             Layout.alignment: Qt.AlignVCenter
+            MouseArea {
+                anchors.fill: parent
+                onClicked: navigationBar.goHome()
+            }
         }
 
         Repeater {
-            model: [qsTr("Home"), qsTr("Series"), qsTr("Movies"), qsTr("My List")]
-            delegate: Label {
-                text: modelData
-                color: "#ECEFF1"
-                font.weight: Font.DemiBold
+            model: [
+                { key: "home", label: qsTr("Home") },
+                { key: "series", label: qsTr("Series") },
+                { key: "movies", label: qsTr("Movies") },
+                { key: "mylist", label: qsTr("My List") }
+            ]
+            delegate: Rectangle {
+                color: "transparent"
+                radius: 10
+                Layout.preferredWidth: implicitWidth + 16
+                Layout.preferredHeight: 32
                 Layout.alignment: Qt.AlignVCenter
-                opacity: 0.9
+                border.color: (navigationBar.currentPage === modelData.key) ? "#4F46E5" : "transparent"
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 4
+                    Text {
+                        text: modelData.label
+                        color: (navigationBar.currentPage === modelData.key) ? "white" : "#ECEFF1"
+                        font.weight: Font.DemiBold
+                        opacity: 0.95
+                    }
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        if (modelData.key === "home") navigationBar.goHome()
+                        else if (modelData.key === "series") navigationBar.openSeries()
+                        else if (modelData.key === "movies") navigationBar.openMovies()
+                        else if (modelData.key === "mylist") navigationBar.openMyList()
+                    }
+                }
             }
         }
 
@@ -68,6 +105,7 @@ Rectangle {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
             }
+            onClicked: navigationBar.openProfile()
         }
     }
 }

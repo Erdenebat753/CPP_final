@@ -73,36 +73,7 @@ Rectangle {
             }
         }
 
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 10
-            Repeater {
-                model: [
-                    { key: "user", label: qsTr("User") },
-                    { key: "admin", label: qsTr("Admin") }
-                ]
-                delegate: Button {
-                    property bool active: loginPage.role === modelData.key
-                    Layout.fillWidth: true
-                    checkable: true
-                    checked: active
-                    text: modelData.label
-                    background: Rectangle {
-                        radius: 10
-                        color: active ? "#0EA5E9" : "#111827"
-                        border.color: active ? "#38BDF8" : "#2C2E3A"
-                    }
-                    contentItem: Text {
-                        text: modelData.label
-                        color: active ? "white" : "#C7D1E5"
-                        font.pixelSize: 14
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
-                    onClicked: loginPage.role = modelData.key
-                }
-            }
-        }
+        // Role UI-гүй: роль автоматаар DB-гээс тодорхойлогдоно
 
         ColumnLayout {
             Layout.fillWidth: true
@@ -170,16 +141,17 @@ Rectangle {
                     verticalAlignment: Text.AlignVCenter
                 }
                 onClicked: {
-                    statusLabel.text = ""
-                    if (!emailField.text.length || !passwordField.text.length) {
-                        statusLabel.text = qsTr("Please fill in all required fields.")
-                        return
+                    const result = backend.authenticate(loginPage.mode,
+                                                        loginPage.role,
+                                                        emailField.text,
+                                                        passwordField.text,
+                                                        confirmField.text)
+                    statusLabel.text = result.message || ""
+                    if (result.success) {
+                        statusLabel.text = ""
+                        const resolvedRole = result.role || loginPage.role
+                        loginPage.loginSucceeded(loginPage.mode, resolvedRole, emailField.text)
                     }
-                    if (loginPage.mode === "signup" && passwordField.text !== confirmField.text) {
-                        statusLabel.text = qsTr("Passwords do not match.")
-                        return
-                    }
-                    loginPage.loginSucceeded(loginPage.mode, loginPage.role, emailField.text)
                 }
             }
 

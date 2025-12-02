@@ -44,24 +44,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="core\DataProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\AuthService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\AuthRepository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\MediaModels.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\StreamingService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="shared\DatabaseUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="models\MediaModels.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="models\StreamingDataModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClCompile Include="shared\DatabaseUtils.cpp">
+    <ClCompile Include="backend\Backend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\AuthService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\StreamingService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="models\StreamingDataModel.cpp">
+    <ClCompile Include="shared\DatabaseUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <QtMoc Include="backend\Backend.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
     <QtRcc Include="qml.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
@@ -80,19 +101,24 @@
     <None Include="qml\pages\HomePage.qml">
       <Filter>qml\pages</Filter>
     </None>
+    <None Include="qml\pages\AdminPage.qml">
+      <Filter>qml\pages</Filter>
+    </None>
     <None Include="qml\pages\LoginPage.qml">
       <Filter>qml\pages</Filter>
     </None>
     <None Include="qml\utils\Formatting.js">
       <Filter>qml\utils</Filter>
     </None>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FinalProject.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="qml\pages\ProfilePage.qml">
+      <Filter>qml\pages</Filter>
+    </None>
   </ItemGroup>
 </Project>

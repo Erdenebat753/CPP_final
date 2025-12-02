@@ -1,69 +1,67 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include <QVariant>
+#include <QCoreApplication>
+#include <QFile>
+#include <QTextStream>
+#include <QIODevice>
+#include <cstdio>
 
-#include "models/StreamingDataModel.h"
-#include "shared/DatabaseUtils.h"
+#include "backend/Backend.h"
 
 namespace
 {
-QVariantMap toVariantMap(const MediaItem &item)
+void logMessage(QtMsgType type, const QMessageLogContext &, const QString &msg)
 {
-    QVariantMap map;
-    map.insert(QStringLiteral("title"), item.title);
-    map.insert(QStringLiteral("genre"), item.genre);
-    map.insert(QStringLiteral("duration"), item.duration);
-    map.insert(QStringLiteral("rating"), item.rating);
-    map.insert(QStringLiteral("description"), item.description);
-    map.insert(QStringLiteral("accentColor"), item.accentColor);
-    map.insert(QStringLiteral("thumbnailUrl"), DatabaseUtils::toFileUrl(item.thumbnailUrl));
-    map.insert(QStringLiteral("videoUrl"), DatabaseUtils::toFileUrl(item.videoUrl));
-    return map;
-}
-
-QVariantList toVariantList(const QVector<MediaItem> &items)
-{
-    QVariantList list;
-    list.reserve(items.size());
-    for (const auto &item : items)
+    static QFile logFile(QCoreApplication::applicationDirPath() + QStringLiteral("/debug.log"));
+    if (!logFile.isOpen())
     {
-        list.append(toVariantMap(item));
+        logFile.open(QIODevice::Append | QIODevice::Text);
     }
-    return list;
-}
 
-QVariantList buildCategories(const QVector<MediaCategory> &categories)
-{
-    QVariantList list;
-    list.reserve(categories.size());
-    for (const auto &category : categories)
+    QTextStream stream(&logFile);
+    stream << msg << Qt::endl;
+
+    // Also mirror critical/warning to stderr for attached consoles
+    if (type == QtWarningMsg || type == QtCriticalMsg || type == QtFatalMsg)
     {
-        QVariantMap map;
-        map.insert(QStringLiteral("name"), category.name);
-        map.insert(QStringLiteral("items"), toVariantList(category.items));
-        list.append(map);
+        fprintf(stderr, "%s\n", msg.toLocal8Bit().constData());
+        fflush(stderr);
     }
-    return list;
 }
 } // namespace
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
+    qInstallMessageHandler(logMessage);
 
-    StreamingDataModel dataModel;
-    const QVariantMap heroItem = toVariantMap(dataModel.featuredItem());
-    const QVariantList categories = buildCategories(dataModel.categories());
+    Backend backend(Backend::createSqlProvider());
+    backend.reload();
 
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty(QStringLiteral("heroItem"), heroItem);
-    engine.rootContext()->setContextProperty(QStringLiteral("categoriesModel"), categories);
+    engine.rootContext()->setContextProperty(QStringLiteral("backend"), &backend);
 
     const QUrl url(QStringLiteral("qrc:/qt/qml/finalproject/main.qml"));
+    QObject::connect(&engine, &QQmlApplicationEngine::warnings, [](const QList<QQmlError> &warnings) {
+        for (const auto &w : warnings)
+        {
+            qWarning() << "QML warning:" << w.toString();
+        }
+    });
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreationFailed,
                      &app, []() { QCoreApplication::exit(-1); }, Qt::QueuedConnection);
     engine.load(url);
 
+    if (engine.rootObjects().isEmpty())
+    {
+        qCritical() << "Failed to load QML root object";
+        return -1;
+    }
+
     return app.exec();
 }
+#include <QFile>
+#include <QTextStream>
+#include <QIODevice>
+#include <QCoreApplication>

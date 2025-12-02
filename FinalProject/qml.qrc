@@ -6,6 +6,11 @@
         <file>qml/components/NavigationBar.qml</file>
         <file>qml/pages/HomePage.qml</file>
         <file>qml/pages/LoginPage.qml</file>
+        <file>qml/pages/AdminPage.qml</file>
+        <file>qml/pages/ProfilePage.qml</file>
+        <file>qml/pages/SeriesPage.qml</file>
+        <file>qml/pages/MoviesPage.qml</file>
+        <file>qml/pages/MyListPage.qml</file>
         <file>qml/utils/Formatting.js</file>
     </qresource>
 </RCC>

@@ -38,7 +38,7 @@ void StreamingDataModel::loadData()
 
     QSqlQuery heroQuery(db);
     const QString heroSql = QStringLiteral(
-        "SELECT t.id, t.name, t.description, t.age_rating, t.runtime_min, t.accent_color, "
+        "SELECT t.id, t.type, t.name, t.description, t.age_rating, t.runtime_min, t.accent_color, "
         "IFNULL(m.thumbnail_url, '') AS thumbnail_url, IFNULL(m.video_url, '') AS video_url, "
         "IFNULL((SELECT g.name FROM genres g JOIN title_genres tg ON tg.genre_id = g.id "
         "WHERE tg.title_id = t.id ORDER BY g.name LIMIT 1), '') AS primary_genre "
@@ -77,14 +77,15 @@ void StreamingDataModel::loadData()
 MediaItem StreamingDataModel::buildItemFromQuery(const QSqlQuery &query, const QString &genreName) const
 {
     MediaItem item;
-    item.title = query.value(1).toString();
+    item.type = query.value(1).toString();
+    item.title = query.value(2).toString();
     item.genre = genreName;
-    item.description = query.value(2).toString();
-    item.rating = query.value(3).toString();
-    item.duration = formatDuration(query.value(4).toInt());
-    item.accentColor = query.value(5).toString();
-    item.thumbnailUrl = query.value(6).toString();
-    item.videoUrl = query.value(7).toString();
+    item.description = query.value(3).toString();
+    item.rating = query.value(4).toString();
+    item.duration = formatDuration(query.value(5).toInt());
+    item.accentColor = query.value(6).toString();
+    item.thumbnailUrl = query.value(7).toString();
+    item.videoUrl = query.value(8).toString();
     return item;
 }
 
@@ -93,7 +94,7 @@ QVector<MediaItem> StreamingDataModel::itemsForGenre(int genreId, const QString 
     QVector<MediaItem> items;
     QSqlQuery query(db);
     query.prepare(QStringLiteral(
-        "SELECT t.id, t.name, t.description, t.age_rating, t.runtime_min, t.accent_color, "
+        "SELECT t.id, t.type, t.name, t.description, t.age_rating, t.runtime_min, t.accent_color, "
         "IFNULL(m.thumbnail_url, ''), IFNULL(m.video_url, '') "
         "FROM titles t "
         "JOIN title_genres tg ON tg.title_id = t.id "
